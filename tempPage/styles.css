@@ -1,0 +1,26 @@
+/* Лабораторная № 4: только структурное расположение, без полноценного дизайна */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, sans-serif; line-height: 1.5; }
+.site-header, .site-footer { padding: 14px max(20px, calc((100% - 1120px)/2)); }
+.site-header { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #bbb; }
+.brand { margin: 0; font-weight: bold; }
+.nav-list { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; margin: 0; list-style: none; }
+.container { max-width: 1120px; margin: 0 auto; padding: 22px 20px; display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.page-heading, #history, aside { grid-column: 1 / -1; }
+.page-heading h1, .section h2 { margin-top: 0; }
+.section { border: 1px solid #bbb; padding: 18px; }
+.section-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
+.car-properties { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; }
+.car-properties dd { margin: 0; }
+.filters { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.filters label { display: block; }
+.filters input, .filters select, .filters button { padding: 7px; font: inherit; max-width: 100%; }
+.entry-list { list-style: none; padding: 0; }
+.entry-list li { border-top: 1px solid #ccc; }
+.entry-list article { padding: 10px 0; }
+.entry-list h3, .entry-list p { margin: 5px 0; }
+.site-footer { border-top: 1px solid #bbb; }
+@media (max-width: 700px) {
+  .container { display: block; }
+  .section { margin-bottom: 14px; }
+}

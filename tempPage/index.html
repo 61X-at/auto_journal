@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="АвтоЖурнал — электронная история обслуживания личного автомобиля.">
+  <title>АвтоЖурнал — Главная</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <p class="brand"><a href="#top">АвтоЖурнал</a></p>
+    <nav aria-label="Основная навигация">
+      <ul class="nav-list">
+        <li><a href="#top" aria-current="page">Главная</a></li>
+        <li><a href="#car">Автомобиль</a></li>
+        <li><a href="#history">Журнал</a></li>
+        <li><a href="#maintenance">План ТО</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="top" class="container">
+    <header class="page-heading">
+      <h1>Главная</h1>
+      <p>История обслуживания, затраты и предстоящие работы по одному автомобилю.</p>
+    </header>
+
+    <section id="car" aria-labelledby="car-heading" class="section">
+      <h2 id="car-heading">Мой автомобиль</h2>
+      <article aria-label="Карточка автомобиля">
+        <h3>Lada Vesta</h3>
+        <dl class="car-properties">
+          <dt>Год выпуска</dt><dd>2021</dd>
+          <dt>Текущий пробег</dt><dd>86 200 км</dd>
+        </dl>
+        <p><a href="#car">Изменить данные автомобиля</a></p>
+      </article>
+    </section>
+
+    <section id="expenses" aria-labelledby="expenses-heading" class="section">
+      <h2 id="expenses-heading">Расходы на обслуживание</h2>
+      <p>Всего за выбранный период: <strong><data value="24500">24 500 ₽</data></strong></p>
+      <ul>
+        <li>Техническое обслуживание — 12 000 ₽</li>
+        <li>Ремонт — 8 500 ₽</li>
+        <li>Замена деталей — 4 000 ₽</li>
+      </ul>
+    </section>
+
+    <section id="maintenance" aria-labelledby="maintenance-heading" class="section">
+      <h2 id="maintenance-heading">Ближайшее ТО</h2>
+      <article aria-label="Предстоящая работа">
+        <h3>Замена моторного масла</h3>
+        <p>Плановый пробег: 90 000 км</p>
+        <p>Осталось: 3 800 км</p>
+        <p><a href="#maintenance">Посмотреть план работ</a></p>
+      </article>
+    </section>
+
+    <section id="history" aria-labelledby="history-heading" class="section">
+      <header class="section-header">
+        <h2 id="history-heading">Последние записи</h2>
+        <a href="#history">Все записи</a>
+      </header>
+      <form class="filters" role="search" action="#history" method="get">
+        <p>
+          <label for="entry-query">Поиск по описанию</label>
+          <input id="entry-query" name="q" type="search" placeholder="Например, замена масла">
+        </p>
+        <p>
+          <label for="entry-category">Тип события</label>
+          <select id="entry-category" name="category">
+            <option value="">Все типы</option>
+            <option value="maintenance">ТО</option>
+            <option value="repair">Ремонт</option>
+            <option value="replacement">Замена детали</option>
+            <option value="purchase">Покупка</option>
+          </select>
+        </p>
+        <button type="submit">Найти</button>
+      </form>
+      <ul class="entry-list">
+        <li>
+          <article>
+            <h3>Замена масла и фильтра</h3>
+            <p><time datetime="2026-09-15">15.09.2026</time> · ТО · Пробег 85 000 км</p>
+            <p><data value="7500">7 500 ₽</data></p>
+          </article>
+        </li>
+        <li>
+          <article>
+            <h3>Замена тормозных колодок</h3>
+            <p><time datetime="2026-08-10">10.08.2026</time> · Замена детали · Пробег 83 500 км</p>
+            <p><data value="4000">4 000 ₽</data></p>
+          </article>
+        </li>
+      </ul>
+      <p><a href="#history">Добавить запись (переход будет реализован позднее)</a></p>
+    </section>
+
+    <aside class="section" aria-labelledby="note-heading">
+      <h2 id="note-heading">Об этом макете</h2>
+      <p>Здесь показаны только структура и демонстрационные данные. Формы, сохранение и расчёты будут реализованы на следующих этапах.</p>
+    </aside>
+  </main>
+  <footer class="site-footer">
+    <p>АвтоЖурнал · Учебный проект · HTML-структура для лабораторной № 4</p>
+  </footer>
+</body>
+</html>

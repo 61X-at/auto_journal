@@ -5,8 +5,8 @@
   "type": "module",
   "description": "Учебный MVP электронного журнала автомобиля. ЛР 4: только HTML-структура.",
   "scripts": {
-    "dev": "vite tempPage",
-    "build": "vite build tempPage",
+    "dev": "vite --open /tempPage/index.html",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {

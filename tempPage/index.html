@@ -89,23 +89,8 @@
 
     <section id="expenses" aria-labelledby="expenses-heading" class="section section--expenses">
       <h2 id="expenses-heading" class="section-heading">Коротко о главном</h2>
-      <div class="summary-grid">
-        <article class="summary-card">
-          <p class="summary-card__label">Всего расходов <span class="summary-icon" aria-hidden="true">₽</span></p>
-          <p class="summary-card__value"><data value="24500">24 500 ₽</data></p>
-          <p class="summary-card__hint">По всем событиям в журнале</p>
-        </article>
-        <article class="summary-card">
-          <p class="summary-card__label">Записей в журнале <span class="summary-icon" aria-hidden="true">≡</span></p>
-          <p class="summary-card__value">2</p>
-          <p class="summary-card__hint">Примеры выполненных работ</p>
-        </article>
-        <article class="summary-card">
-          <p class="summary-card__label">Ближайшее ТО <span class="summary-icon" aria-hidden="true">▣</span></p>
-          <p class="summary-card__value">1</p>
-          <p class="summary-card__hint">Запланированная работа</p>
-        </article>
-      </div>
+      <!-- FE-005: эти карточки создаются общим компонентом SummaryCard. -->
+      <div class="summary-grid"></div>
       <details class="expense-breakdown">
         <summary>Расходы по категориям</summary>
         <ul>
@@ -171,7 +156,7 @@
   </template>
 
   <footer class="site-footer">
-    <p>АвтоЖурнал · Учебный проект · FE-004</p>
+    <p>АвтоЖурнал · Учебный проект · FE-005</p>
   </footer>
   <script type="module" src="../src/main.js"></script>
 </body>

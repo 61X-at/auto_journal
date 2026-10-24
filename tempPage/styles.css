@@ -284,3 +284,27 @@ button, input, select { font: inherit; }
   .profile-list { grid-template-columns: 1fr; }
   .plan-item { flex-direction: column; align-items: flex-start; }
 }
+
+/* FE-005: переиспользуемые поля, демонстрационные формы и сообщения. */
+.component-example { margin-top: 19px; padding-top: 14px; border-top: 1px solid var(--line); }
+.component-example summary { cursor: pointer; color: var(--primary); font-weight: 650; }
+.component-example__note { color: var(--muted); font-size: 13px; }
+.component-demo-form { margin-top: 14px; }
+.component-demo-form__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 14px; }
+.component-demo-form .form-field { display: grid; gap: 6px; min-width: 0; }
+.form-field--shared input {
+  width: 100%; min-height: 44px; padding: 10px 14px;
+  border: 1px solid #d7e1ef; border-radius: 9px; color: var(--text); background: var(--surface);
+}
+.form-field--shared input[aria-invalid="true"] { border-color: #c73535; }
+.form-field__hint { margin: 0; color: var(--muted); font-size: 12px; }
+.form-field__error { margin: 0; color: #ae2e2e; font-size: 12px; }
+.form-field__error[hidden] { display: none; }
+.required-mark { color: #ae2e2e; }
+.component-demo-form__result { margin-top: 10px; }
+.error-notice { margin: 0; padding: 10px 13px; border-radius: 9px; background: #fff0f0; color: #a22626; }
+.demo-success { margin: 0; color: #176b43; }
+.empty-state { margin-top: 14px; padding: 25px 20px; text-align: center; border: 1px dashed var(--line); border-radius: 13px; background: #fafcff; }
+.empty-state h3 { margin: 0 0 7px; font-size: 17px; }
+.empty-state p { margin: 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 620px) { .component-demo-form__fields { grid-template-columns: minmax(0, 1fr); } }

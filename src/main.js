@@ -1,6 +1,7 @@
 import { renderHomePage } from './pages/HomePage.js';
 import { renderCarPage } from './pages/CarPage.js';
 import { renderJournalPage } from './pages/JournalPage.js';
+import { renderNewServiceEntryPage } from './pages/NewServiceEntryPage.js';
 import { renderMaintenancePage } from './pages/MaintenancePage.js';
 import { readCar, readEntries, readPlans } from './storage/localStorage.js';
 import { createErrorNotice } from './components/ErrorNotice.js';
@@ -11,6 +12,7 @@ const routes = {
   home: { title: 'Обзор автомобиля', render: renderHomePage },
   car: { title: 'Автомобиль', render: renderCarPage },
   journal: { title: 'Журнал обслуживания', render: renderJournalPage },
+  'journal/new': { title: 'Новая запись обслуживания', render: renderNewServiceEntryPage },
   maintenance: { title: 'План ТО', render: renderMaintenancePage },
 };
 
@@ -28,6 +30,7 @@ const storageSections = {
   home: ['car', 'entries', 'plans'],
   car: ['car'],
   journal: ['entries'],
+  'journal/new': ['entries'],
   maintenance: ['plans'],
 };
 const storageReaders = { car: readCar, entries: readEntries, plans: readPlans };
@@ -74,7 +77,7 @@ function renderRoute() {
   document.title = `АвтоЖурнал — ${route.title}`;
 
   for (const link of navigationLinks) {
-    const isActive = link.getAttribute('href') === `#/${current}`;
+    const isActive = link.getAttribute('href') === `#/${current === 'journal/new' ? 'journal' : current}`;
     link.classList.toggle('nav-link--active', isActive);
     if (isActive) {
       link.setAttribute('aria-current', 'page');

@@ -1,7 +1,7 @@
 /** Подписанное поле ввода с поддержкой required, подсказки и ошибки. */
 export function createFormField({
   id, label, name = id, type = 'text', required = false,
-  min, max, placeholder = '', value = '', helpText = '', disabled = false,
+  min, max, step, placeholder = '', value = '', helpText = '', disabled = false, options = [],
 } = {}) {
   if (!id || !label) {
     throw new TypeError('Компонент FormField требует id и label');
@@ -21,16 +21,27 @@ export function createFormField({
     labelElement.append(requiredMark);
   }
 
-  const input = document.createElement('input');
+  // FE-010: тот же компонент используется и для выпадающего списка категорий.
+  const input = document.createElement(type === 'select' ? 'select' : 'input');
   input.id = id;
   input.name = name;
-  input.type = type;
+  if (type !== 'select') input.type = type;
   input.required = required;
   input.disabled = disabled;
-  input.placeholder = placeholder;
+  if (type === 'select') {
+    for (const option of options) {
+      const optionElement = document.createElement('option');
+      optionElement.value = option.value;
+      optionElement.textContent = option.label;
+      input.append(optionElement);
+    }
+  } else {
+    input.placeholder = placeholder;
+  }
   input.value = value;
   if (min !== undefined) input.min = String(min);
   if (max !== undefined) input.max = String(max);
+  if (step !== undefined) input.step = String(step);
 
   const descriptions = [];
   if (helpText) {
@@ -52,11 +63,12 @@ export function createFormField({
   if (descriptions.length) input.setAttribute('aria-describedby', descriptions.join(' '));
 
   input.addEventListener('input', () => setFieldError(wrapper, ''));
+  if (type === 'select') input.addEventListener('change', () => setFieldError(wrapper, ''));
   return wrapper;
 }
 
 export function setFieldError(field, message) {
-  const input = field.querySelector('input');
+  const input = (field.querySelector('input') || field.querySelector('select'));
   const error = field.querySelector('.form-field__error');
   if (!input || !error) throw new TypeError('Передан не компонент FormField');
 
@@ -82,7 +94,7 @@ export function setFieldError(field, message) {
 export function validateFormFields(form) {
   let firstInvalid = null;
   for (const field of form.querySelectorAll('.form-field--shared')) {
-    const input = field.querySelector('input');
+    const input = (field.querySelector('input') || field.querySelector('select'));
     const label = field.querySelector('label')?.textContent?.replace(/\s*\*$/, '') || 'Поле';
     let message = '';
 

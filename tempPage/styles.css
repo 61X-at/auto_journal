@@ -292,11 +292,11 @@ button, input, select { font: inherit; }
 .component-demo-form { margin-top: 14px; }
 .component-demo-form__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 14px; }
 .component-demo-form .form-field { display: grid; gap: 6px; min-width: 0; }
-.form-field--shared input {
+.form-field--shared input, .form-field--shared select {
   width: 100%; min-height: 44px; padding: 10px 14px;
   border: 1px solid #d7e1ef; border-radius: 9px; color: var(--text); background: var(--surface);
 }
-.form-field--shared input[aria-invalid="true"] { border-color: #c73535; }
+.form-field--shared input[aria-invalid="true"], .form-field--shared select[aria-invalid="true"] { border-color: #c73535; }
 .form-field__hint { margin: 0; color: var(--muted); font-size: 12px; }
 .form-field__error { margin: 0; color: #ae2e2e; font-size: 12px; }
 .form-field__error[hidden] { display: none; }
@@ -327,4 +327,16 @@ button, input, select { font: inherit; }
 @media (max-width: 620px) {
   .car-form__fields { grid-template-columns: minmax(0, 1fr); }
   .car-form__actions .button { width: 100%; }
+}
+
+/* FE-010: новая запись обслуживания. Общие поля и кнопки используются повторно. */
+.service-form__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.service-form__fields .form-field { min-width: 0; }
+.service-form__fields .form-field:nth-child(4) { grid-column: 1 / -1; }
+.service-form__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.service-form__feedback { margin-top: 12px; }
+@media (max-width: 620px) {
+  .service-form__fields { grid-template-columns: minmax(0, 1fr); }
+  .service-form__fields .form-field:nth-child(4) { grid-column: auto; }
+  .service-form__actions .button { flex: 1 1 auto; }
 }

@@ -8,7 +8,7 @@ export function renderHomePage() {
 
   const page = template.content.cloneNode(true);
   const link = page.querySelector('.page-heading .button');
-  link.replaceWith(createButton({ label: 'Перейти к журналу →', href: '#/journal' }));
+  link.replaceWith(createButton({ label: 'Добавить запись +', href: '#/journal/new' }));
 
   const summary = page.querySelector('.summary-grid');
   summary.replaceChildren(

@@ -2,6 +2,8 @@ import { pageFragment } from './pageFragment.js';
 import { createButton } from '../components/Button.js';
 import { createDemoForm } from '../components/DemoForm.js';
 import { createEmptyState } from '../components/EmptyState.js';
+import { createErrorNotice } from '../components/ErrorNotice.js';
+import { deleteServiceEntry } from '../utils/serviceEntryActions.js';
 import { readEntries } from '../storage/localStorage.js';
 import { sortServiceEntriesByDate, formatServiceDate } from '../utils/serviceHistory.js';
 
@@ -48,7 +50,20 @@ export function createServiceHistoryList(entries) {
       ? `${price.toLocaleString('ru-RU')} ₽`
       : 'Стоимость не указана';
     amount.textContent = priceText;
-    card.append(marker, text, amount);
+    const actions = document.createElement('div');
+    actions.className = 'entry-card__actions';
+    // Ссылка сохраняет ID записи в адресе; новая запись не создаётся.
+    if (typeof entry?.id === 'string' && entry.id.trim()) {
+      actions.append(createButton({
+        label: 'Изменить', variant: 'secondary',
+        href: `#/journal/edit/${encodeURIComponent(entry.id)}`,
+      }));
+      const remove = createButton({ label: 'Удалить', variant: 'secondary' });
+      remove.setAttribute('data-action', 'delete-entry');
+      remove.setAttribute('data-entry-id', entry.id);
+      actions.append(remove);
+    }
+    card.append(marker, text, amount, actions);
     item.append(card);
     list.append(item);
   }
@@ -80,7 +95,8 @@ export function renderJournalPage() {
     <section class="section section--single" aria-labelledby="journal-page-heading">
       <h2 id="journal-page-heading" class="section-heading">История обслуживания</h2>
       <div id="journal-records"></div>
-      <p class="placeholder-note">Записи отсортированы от новых к старым. Поиск, редактирование и удаление появятся в следующих задачах.</p>
+      <div id="journal-action-feedback" aria-live="polite"></div>
+      <p class="placeholder-note">Записи отсортированы от новых к старым. Поиск и фильтрация появятся в следующей задаче.</p>
       <details class="component-example">
         <summary>Проверить общие компоненты формы (FE-005)</summary>
         <p class="component-example__note">Демонстрационная проверка полей без создания записи.</p>
@@ -99,6 +115,37 @@ export function renderJournalPage() {
       description: 'Данные журнала не удалось прочитать; сохранённое содержимое не перезаписывается.',
     }));
   }
+  // Делегирование: после удаления список заменяется, но обработчик остаётся один.
+  const actionFeedback = page.querySelector('#journal-action-feedback');
+  host.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-action="delete-entry"]');
+    if (!button || !host.contains(button)) return;
+    const id = button.getAttribute('data-entry-id');
+    // Отмена диалога не вызывает запись в localStorage.
+    if (!window.confirm('Удалить эту запись из журнала? Действие нельзя отменить.')) return;
+    const deleted = deleteServiceEntry(id, { confirmed: true });
+    actionFeedback.replaceChildren();
+    if (!deleted.ok) {
+      actionFeedback.append(createErrorNotice(deleted.message));
+      return;
+    }
+    const current = readEntries();
+    if (!current.ok) {
+      host.replaceChildren(createEmptyState({
+        title: 'История недоступна',
+        description: 'Не удалось прочитать данные после удаления.',
+      }));
+      actionFeedback.append(createErrorNotice(current.message));
+      return;
+    }
+    host.replaceChildren(current.data.length
+      ? createServiceHistoryList(current.data)
+      : createEmptyJournalState());
+    const status = document.createElement('p');
+    status.className = 'journal-action-success';
+    status.textContent = 'Запись удалена.';
+    actionFeedback.append(status);
+  });
   page.querySelector('#journal-form-demo').append(createDemoForm({
     id: 'journal-component-demo',
     fields: [

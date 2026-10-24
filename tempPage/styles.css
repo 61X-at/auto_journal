@@ -343,3 +343,15 @@ button, input, select { font: inherit; }
 
 /* FE-011: призыв создать первую запись в пустом журнале. */
 #journal-records > .empty-state .button { display: inline-flex; margin-top: 16px; }
+
+/* FE-012: действия с отдельной записью обслуживания. */
+.entry-card { flex-wrap: wrap; }
+.entry-card__actions { display: flex; align-items: center; gap: 8px; margin-left: 0; }
+.entry-card__actions .button { min-height: 36px; padding: 7px 11px; font-size: 12px; }
+#journal-action-feedback:not(:empty) { margin-top: 12px; }
+.journal-action-success { margin: 0; color: #176b43; font-size: 13px; }
+#edit-entry-container > .error-notice { margin-bottom: 15px; }
+@media (max-width: 620px) {
+  .entry-card__actions { width: 100%; margin-left: 0; }
+  .entry-card__actions .button { flex: 1 1 0; }
+}

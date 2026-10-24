@@ -45,9 +45,10 @@ function localDateISO() {
   return `${year}-${month}-${day}`;
 }
 
-function makeForm(readable) {
+/** Общая форма для создания и редактирования записи (FE-010 / FE-012). */
+export function createServiceEntryForm(readable, { entry = null } = {}) {
   const form = document.createElement('form');
-  form.id = 'new-service-entry-form';
+  form.id = entry ? 'edit-service-entry-form' : 'new-service-entry-form';
   form.className = 'service-form';
   form.noValidate = true;
 
@@ -56,24 +57,24 @@ function makeForm(readable) {
   fields.append(
     createFormField({
       id: FIELD_IDS.type, name: 'type', label: 'Тип события', type: 'select',
-      required: true, disabled: !readable, options: [
+      required: true, value: entry?.type ?? '', disabled: !readable, options: [
         { value: '', label: 'Выберите тип события' },
         ...SERVICE_ENTRY_TYPES.map((type) => ({ value: type, label: type === 'ТО' ? 'ТО' : type[0].toUpperCase() + type.slice(1) })),
       ],
     }),
     createFormField({ id: FIELD_IDS.date, name: 'date', label: 'Дата', type: 'date',
-      required: true, value: localDateISO(), disabled: !readable }),
+      required: true, value: entry?.date ?? localDateISO(), disabled: !readable }),
     createFormField({ id: FIELD_IDS.mileage, name: 'mileage', label: 'Пробег, км', type: 'number',
-      min: 0, step: 1, required: true, placeholder: '85000', disabled: !readable }),
+      min: 0, step: 1, required: true, value: entry?.mileage ?? '', placeholder: '85000', disabled: !readable }),
     createFormField({ id: FIELD_IDS.description, name: 'description', label: 'Описание',
-      required: true, placeholder: 'Например, замена моторного масла и фильтра', disabled: !readable }),
+      required: true, value: entry?.description ?? '', placeholder: 'Например, замена моторного масла и фильтра', disabled: !readable }),
     createFormField({ id: FIELD_IDS.amount, name: 'amount', label: 'Стоимость, ₽', type: 'number',
-      min: 0, step: 'any', required: true, placeholder: '7500', disabled: !readable }),
+      min: 0, step: 'any', required: true, value: entry?.amount ?? '', placeholder: '7500', disabled: !readable }),
   );
   const actions = document.createElement('div');
   actions.className = 'service-form__actions';
   actions.append(
-    createButton({ label: 'Сохранить запись', type: 'submit', disabled: !readable }),
+    createButton({ label: entry ? 'Сохранить изменения' : 'Сохранить запись', type: 'submit', disabled: !readable }),
     createButton({ label: 'Отмена', variant: 'secondary', href: '#/journal' }),
   );
   const feedback = document.createElement('div');
@@ -83,13 +84,13 @@ function makeForm(readable) {
   return { form, feedback };
 }
 
-function formValues(form) {
+export function readServiceEntryFormValues(form) {
   return Object.fromEntries(Object.entries(FIELD_IDS).map(
     ([key, id]) => [key, form.querySelector(`#${id}`).value],
   ));
 }
 
-function showErrors(form, errors) {
+export function showServiceEntryErrors(form, errors) {
   for (const [name, id] of Object.entries(FIELD_IDS)) {
     const field = form.querySelector(`#${id}`).closest('.form-field');
     setFieldError(field, errors[name] || '');
@@ -112,7 +113,7 @@ export function renderNewServiceEntryPage() {
       <div id="new-entry-container"></div>
     </section>
   `);
-  const { form, feedback } = makeForm(available.ok);
+  const { form, feedback } = createServiceEntryForm(available.ok);
   page.querySelector('#new-entry-container').append(form);
   if (!available.ok) {
     feedback.append(createErrorNotice('Хранилище недоступно или содержит повреждённые данные. Добавление записи заблокировано во избежание потери истории.'));
@@ -123,8 +124,8 @@ export function renderNewServiceEntryPage() {
     event.preventDefault();
     if (!available.ok) return;
 
-    const result = saveNewServiceEntry(formValues(form));
-    showErrors(form, result.errors || {});
+    const result = saveNewServiceEntry(readServiceEntryFormValues(form));
+    showServiceEntryErrors(form, result.errors || {});
     feedback.replaceChildren();
     if (!result.ok) {
       feedback.append(createErrorNotice(result.message));

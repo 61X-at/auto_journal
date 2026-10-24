@@ -12,7 +12,7 @@
 
   <header class="site-header">
     <p class="brand">
-      <a href="#top" aria-label="АвтоЖурнал — на главную">
+      <a href="#/home" aria-label="АвтоЖурнал — на главную">
         <span class="brand-mark" aria-hidden="true">А</span>
         <span>АвтоЖурнал</span>
       </a>
@@ -20,23 +20,33 @@
     <p class="nav-caption">Навигация</p>
     <nav aria-label="Основная навигация">
       <ul class="nav-list">
-        <li><a class="nav-link nav-link--active" href="#top" aria-current="page"><span aria-hidden="true">⌂</span> Главная</a></li>
-        <li><a class="nav-link" href="#history"><span aria-hidden="true">≡</span> Журнал</a></li>
-        <li><a class="nav-link" href="#maintenance"><span aria-hidden="true">▣</span> План ТО</a></li>
-        <li><a class="nav-link" href="#car"><span aria-hidden="true">◇</span> Автомобиль</a></li>
+        <li><a class="nav-link nav-link--active" href="#/home" aria-current="page"><span aria-hidden="true">⌂</span> Главная</a></li>
+        <li><a class="nav-link" href="#/journal"><span aria-hidden="true">≡</span> Журнал</a></li>
+        <li><a class="nav-link" href="#/maintenance"><span aria-hidden="true">▣</span> План ТО</a></li>
+        <li><a class="nav-link" href="#/car"><span aria-hidden="true">◇</span> Автомобиль</a></li>
       </ul>
     </nav>
-    <p class="storage-note"><strong>Локальное хранение</strong><span>Сейчас используются демонстрационные данные. Сохранение появится позднее.</span></p>
+    <p class="storage-note"><strong>Локальное хранение</strong><span>Демонстрационные данные. Сохранение будет добавлено по backlog.</span></p>
   </header>
 
-  <main id="main-content" class="container">
+  <!-- Оболочка приложения: содержимое раздела заменяется без перезагрузки. -->
+  <main id="main-content" class="container" tabindex="-1">
+    <!-- Временная подсказка, если JS-модули не загрузились. После успешного запуска заменяется содержимым страницы. -->
+    <section class="section section--notice" aria-labelledby="startup-heading">
+      <h1 id="startup-heading" class="section-heading">Приложение не запущено</h1>
+      <p>Для работы навигации откройте проект через локальный сервер: выполните <code>npm install</code>, затем <code>npm run dev</code> в корне проекта. Откройте <code>http://localhost:5173/tempPage/index.html</code>. Не открывайте HTML двойным щелчком.</p>
+    </section>
+  </main>
+
+  <!-- Разметка главной сохранена из ЛР № 5 и используется только на маршруте #/home. -->
+  <template id="home-page-template">
     <header class="page-heading" id="top">
       <div class="page-heading__text">
         <p class="eyebrow">Мой автомобиль / Главная</p>
         <h1>Обзор автомобиля</h1>
         <p>Вся история обслуживания автомобиля — в одном месте.</p>
       </div>
-      <a class="button button--primary" href="#history">Перейти к журналу <span aria-hidden="true">→</span></a>
+      <a class="button button--primary" href="#/journal">Перейти к журналу <span aria-hidden="true">→</span></a>
     </header>
 
     <section id="car" aria-labelledby="car-heading" class="section section--car">
@@ -73,7 +83,7 @@
         <h3>Замена моторного масла</h3>
         <p class="maintenance-card__subtitle">Плановый пробег: 90 000 км</p>
         <p>Осталось по пробегу: <strong>3 800 км</strong></p>
-        <a class="text-link" href="#maintenance">Перейти к плану ТО <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="#/maintenance">Перейти к плану ТО <span aria-hidden="true">→</span></a>
       </article>
     </section>
 
@@ -112,14 +122,14 @@
         <h2 id="history-heading" class="section-heading">Последние записи</h2>
         <span class="section-helper">История обслуживания</span>
       </header>
-      <form class="filters" role="search" action="#history" method="get">
+      <form class="filters" role="search" aria-label="Поиск по истории (пока недоступен)">
         <div class="form-field">
           <label for="entry-query">Поиск по описанию</label>
-          <input id="entry-query" name="q" type="search" placeholder="Например, замена масла">
+          <input id="entry-query" name="q" type="search" placeholder="Например, замена масла" disabled>
         </div>
         <div class="form-field">
           <label for="entry-category">Тип события</label>
-          <select id="entry-category" name="category">
+          <select id="entry-category" name="category" disabled>
             <option value="">Все типы</option>
             <option value="maintenance">ТО</option>
             <option value="repair">Ремонт</option>
@@ -127,7 +137,7 @@
             <option value="purchase">Покупка</option>
           </select>
         </div>
-        <button class="button button--secondary" type="submit">Найти</button>
+        <button class="button button--secondary" type="button" disabled>Найти</button>
       </form>
       <ul class="entry-list">
         <li>
@@ -151,12 +161,18 @@
           </article>
         </li>
       </ul>
-      <p class="history-note">Поиск и добавление записей будут реализованы в следующих лабораторных. Пока показан статический интерфейс.</p>
+      <p class="history-note">Поиск и добавление записей будут реализованы в следующих задачах backlog. Пока показан статический интерфейс.</p>
     </section>
-  </main>
+
+    <aside class="section section--notice" aria-labelledby="note-heading">
+      <h2 id="note-heading">О демонстрационной странице</h2>
+      <p>Это демонстрационная главная страница из лабораторной № 5. В FE-004 добавлена навигация по разделам; сохранение и расчёты будут реализованы позже.</p>
+    </aside>
+  </template>
 
   <footer class="site-footer">
-    <p>АвтоЖурнал</p>
+    <p>АвтоЖурнал · Учебный проект · FE-004</p>
   </footer>
+  <script type="module" src="../src/main.js"></script>
 </body>
 </html>

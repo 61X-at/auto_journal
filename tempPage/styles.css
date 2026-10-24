@@ -259,3 +259,28 @@ button, input, select { font: inherit; }
   html { scroll-behavior: auto; }
   .nav-link, .button { transition: none; }
 }
+
+
+/* FE-004: каркас отдельных разделов; общие компоненты будут в FE-005. */
+.section--single {
+  grid-column: 1 / -1;
+  padding: 24px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.profile-card h3 { margin: 0 0 18px; font-size: 23px; }
+.profile-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin: 0; }
+.profile-list > div { padding: 13px; background: var(--page-bg); border-radius: 10px; }
+.profile-list dt { color: var(--muted); font-size: 12px; }
+.profile-list dd { margin: 3px 0 0; font-weight: 700; }
+.plan-item { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; }
+.plan-item h3 { margin: 0 0 4px; }
+.plan-item p { margin: 0; color: var(--muted); }
+.placeholder-note { margin: 18px 0 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 520px) {
+  .section--single { padding: 20px 16px; }
+  .profile-list { grid-template-columns: 1fr; }
+  .plan-item { flex-direction: column; align-items: flex-start; }
+}

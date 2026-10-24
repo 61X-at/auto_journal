@@ -340,3 +340,6 @@ button, input, select { font: inherit; }
   .service-form__fields .form-field:nth-child(4) { grid-column: auto; }
   .service-form__actions .button { flex: 1 1 auto; }
 }
+
+/* FE-011: призыв создать первую запись в пустом журнале. */
+#journal-records > .empty-state .button { display: inline-flex; margin-top: 16px; }

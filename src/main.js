@@ -2,6 +2,9 @@ import { renderHomePage } from './pages/HomePage.js';
 import { renderCarPage } from './pages/CarPage.js';
 import { renderJournalPage } from './pages/JournalPage.js';
 import { renderMaintenancePage } from './pages/MaintenancePage.js';
+import { readCar, readEntries, readPlans } from './storage/localStorage.js';
+import { createErrorNotice } from './components/ErrorNotice.js';
+import { createEmptyState } from './components/EmptyState.js';
 
 /** FE-004: навигация по разделам без перезагрузки страницы и данных. */
 const routes = {
@@ -19,11 +22,55 @@ function getCurrentRoute() {
   return Object.hasOwn(routes, route) ? route : 'home';
 }
 
+// FE-006: показываем ошибку чтения, не отображая демонстрационные данные
+// как будто это повреждённые пользовательские записи.
+const storageSections = {
+  home: ['car', 'entries', 'plans'],
+  car: ['car'],
+  journal: ['entries'],
+  maintenance: ['plans'],
+};
+const storageReaders = { car: readCar, entries: readEntries, plans: readPlans };
+const storageNames = { car: 'автомобиля', entries: 'журнала', plans: 'плана ТО' };
+
+function showStorageErrors(current, content) {
+  const broken = storageSections[current].filter(type => !storageReaders[type]().ok);
+  if (broken.length === 0) return;
+
+  const alert = createErrorNotice(
+    `Не удалось прочитать сохранённые данные: ${broken.map(type => storageNames[type]).join(', ')}. ` +
+    'Данные не удалены. Проверьте доступ к localStorage или повреждённый JSON.'
+  );
+  alert.classList.add('storage-warning');
+  const heading = content.querySelector('.page-heading');
+  if (heading) heading.after(alert);
+  else content.prepend(alert);
+
+  const safeState = () => createEmptyState({
+    title: 'Данные недоступны',
+    description: 'Содержимое хранилища не удалось прочитать. Мы не отображаем повреждённые записи.',
+  });
+
+  if (broken.includes('car')) {
+    content.querySelector('.car-card, .profile-card')?.replaceWith(safeState());
+  }
+  if (broken.includes('entries')) {
+    content.querySelector('.section--history .entry-list, .section--single .entry-list')?.replaceWith(safeState());
+    content.querySelector('.summary-grid')?.replaceChildren(safeState());
+    content.querySelector('.expense-breakdown')?.remove();
+  }
+  if (broken.includes('plans')) {
+    content.querySelector('.maintenance-card, .plan-item')?.replaceWith(safeState());
+  }
+}
+
 function renderRoute() {
   const current = getCurrentRoute();
   const route = routes[current];
 
-  main.replaceChildren(route.render());
+  const content = route.render();
+  showStorageErrors(current, content);
+  main.replaceChildren(content);
   document.title = `АвтоЖурнал — ${route.title}`;
 
   for (const link of navigationLinks) {

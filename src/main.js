@@ -2,6 +2,7 @@ import { renderHomePage } from './pages/HomePage.js';
 import { renderCarPage } from './pages/CarPage.js';
 import { renderJournalPage } from './pages/JournalPage.js';
 import { renderNewServiceEntryPage } from './pages/NewServiceEntryPage.js';
+import { renderEditServiceEntryPage } from './pages/EditServiceEntryPage.js';
 import { renderMaintenancePage } from './pages/MaintenancePage.js';
 import { readCar, readEntries, readPlans } from './storage/localStorage.js';
 import { createErrorNotice } from './components/ErrorNotice.js';
@@ -13,6 +14,7 @@ const routes = {
   car: { title: 'Автомобиль', render: renderCarPage },
   journal: { title: 'Журнал обслуживания', render: renderJournalPage },
   'journal/new': { title: 'Новая запись обслуживания', render: renderNewServiceEntryPage },
+  'journal/edit': { title: 'Редактирование записи', render: () => renderEditServiceEntryPage(getEditId()) },
   maintenance: { title: 'План ТО', render: renderMaintenancePage },
 };
 
@@ -21,7 +23,13 @@ const navigationLinks = [...document.querySelectorAll('.nav-list .nav-link')];
 
 function getCurrentRoute() {
   const route = window.location.hash.replace(/^#\//, '');
+  if (/^journal\/edit\/[^/]+$/.test(route)) return 'journal/edit';
   return Object.hasOwn(routes, route) ? route : 'home';
+}
+
+function getEditId() {
+  const encoded = window.location.hash.replace(/^#\/journal\/edit\//, '');
+  try { return decodeURIComponent(encoded); } catch { return ''; }
 }
 
 // FE-006: показываем ошибку чтения, не отображая демонстрационные данные
@@ -31,6 +39,7 @@ const storageSections = {
   car: ['car'],
   journal: ['entries'],
   'journal/new': ['entries'],
+  'journal/edit': ['entries'],
   maintenance: ['plans'],
 };
 const storageReaders = { car: readCar, entries: readEntries, plans: readPlans };
@@ -77,7 +86,7 @@ function renderRoute() {
   document.title = `АвтоЖурнал — ${route.title}`;
 
   for (const link of navigationLinks) {
-    const isActive = link.getAttribute('href') === `#/${current === 'journal/new' ? 'journal' : current}`;
+    const isActive = link.getAttribute('href') === `#/${current === 'journal/new' || current === 'journal/edit' ? 'journal' : current}`;
     link.classList.toggle('nav-link--active', isActive);
     if (isActive) {
       link.setAttribute('aria-current', 'page');

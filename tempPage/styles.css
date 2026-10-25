@@ -547,3 +547,38 @@ button, input, select { font: inherit; }
 .form-required-note { margin: 0 0 14px; color: #455776; font-size: 13px; }
 /* Кнопки редактирования и удаления остаются достаточно крупными для управления. */
 .entry-card__actions .button { min-height: 44px; }
+
+/* FE-026: содержимое четырёх экранов остаётся в пределах доступной ширины.
+   Пользовательские названия и описания могут быть длинными и без пробелов;
+   переносим сам текст, а не скрываем переполнение целой страницы. */
+.page-heading__text,
+.car-card,
+.car-card__details,
+.profile-list dd,
+.profile-card h3,
+.maintenance-card,
+.maintenance-plan-list .plan-item,
+.summary-card,
+.entry-card__text,
+.entry-card__price,
+.empty-state {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Текст кнопок и ссылок не должен выталкивать сетку за границы экрана. */
+.section-header { flex-wrap: wrap; }
+.section-header .text-link { max-width: 100%; overflow-wrap: anywhere; }
+.service-form__actions .button,
+.maintenance-form__actions .button,
+.expense-period-form__actions .button {
+  min-width: 0;
+  white-space: normal;
+}
+
+@media (max-width: 520px) {
+  .car-card { align-items: flex-start; }
+  .car-illustration { flex: 0 1 130px; align-self: center; }
+  .section-header { align-items: flex-start; }
+  .service-form__actions .button { flex: 1 1 125px; }
+}

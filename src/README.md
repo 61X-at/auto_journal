@@ -197,3 +197,15 @@
 ### FE-025 — доступность
 
 `components/FormField.js` поддерживает текст ошибки с `aria-invalid`, `aria-describedby` и `aria-errormessage` без удаления штатных подсказок. Формы автомобиля (`CarPage`), журнала (`NewServiceEntryPage` / `EditServiceEntryPage`) и плана ТО (`MaintenancePage`) сообщают об обязательных полях и подписаны для вспомогательных технологий. Общая таблица стилей содержит контрастные состояния `:focus-visible` для обеих тем фона. Ручной проход Tab/Enter/Shift+Tab: `tests/fe025-manual-check.md`.
+
+### FE-026 — адаптивная компоновка
+
+`tempPage/styles.css` расширен правилами FE-026 для переносов текста в
+`HomeCarCard`, истории `JournalPage`, карточке `CarPage`, списке `MaintenancePage`
+и сводных карточках. Динамические строки могут не иметь пробелов, поэтому
+у соответствующих контейнеров используются `min-width: 0` и
+`overflow-wrap: anywhere`. Мобильные кнопки форм сохраняют читаемый текст и
+доступный размер. JavaScript-логика и хранилище не меняются.
+
+Структурные регрессионные тесты: `tests/fe026-responsive-layout.test.mjs`;
+ручной чек-лист — `tests/fe026-manual-check.md`.

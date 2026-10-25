@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "node --test tests/*.test.mjs",
     "test:expenses": "node --test tests/fe018-expense-regression.test.mjs",
-    "test:storage": "node --test tests/fe006-local-storage.test.mjs tests/fe027-storage-resilience.test.mjs"
+    "test:storage": "node --test tests/fe006-local-storage.test.mjs tests/fe027-storage-resilience.test.mjs",
+    "test:e2e": "python tests/fe028-e2e-browser.py"
   },
   "devDependencies": {
     "vite": "^6.0.0"

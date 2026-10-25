@@ -527,3 +527,23 @@ button, input, select { font: inherit; }
 .section--car .car-card > .empty-state { flex: 1; margin: 0; }
 .section--car .car-card .empty-state .button { display: inline-flex; margin-top: 14px; }
 .car-card__edit { display: inline-flex; margin-top: 15px; font-size: 13px; }
+
+
+/* FE-025: фокус виден с клавиатуры на светлых формах и тёмной навигации.
+   Текст статусов ТО уже обозначает их смысл независимо от цвета. */
+:root { --keyboard-focus: #1245a5; --keyboard-focus-dark: #ffcf70; }
+:focus-visible { outline: 3px solid var(--keyboard-focus); outline-offset: 3px; }
+.site-header :focus-visible { outline-color: var(--keyboard-focus-dark); outline-offset: 4px; }
+.skip-link:focus-visible { outline-color: var(--keyboard-focus); }
+.form-field--shared input:focus-visible,
+.form-field--shared select:focus-visible,
+.filters input:focus-visible, .filters select:focus-visible {
+  border-color: var(--keyboard-focus);
+  outline: 3px solid var(--keyboard-focus);
+  outline-offset: 2px;
+}
+.form-field--shared input[aria-invalid="true"],
+.form-field--shared select[aria-invalid="true"] { border-color: #a11b1b; }
+.form-required-note { margin: 0 0 14px; color: #455776; font-size: 13px; }
+/* Кнопки редактирования и удаления остаются достаточно крупными для управления. */
+.entry-card__actions .button { min-height: 44px; }

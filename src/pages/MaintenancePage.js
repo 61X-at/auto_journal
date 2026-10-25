@@ -42,7 +42,12 @@ export function createMaintenanceForm(readable = true) {
   form.className = 'maintenance-form';
   form.noValidate = true;
   form.setAttribute('aria-label', 'Новая плановая работа');
+  form.setAttribute('aria-describedby', 'maintenance-form-required-note');
   form.hidden = true;
+  const requiredNote = document.createElement('p');
+  requiredNote.id = 'maintenance-form-required-note';
+  requiredNote.className = 'form-required-note';
+  requiredNote.textContent = 'Поле со знаком * обязательно. Для срока ТО укажите дату или пробег (можно оба).';
 
   const fields = document.createElement('div');
   fields.className = 'maintenance-form__fields';
@@ -70,7 +75,7 @@ export function createMaintenanceForm(readable = true) {
   const feedback = document.createElement('div');
   feedback.className = 'maintenance-form__feedback';
   feedback.setAttribute('aria-live', 'polite');
-  form.append(fields, actions, feedback);
+  form.append(fields, requiredNote, actions, feedback);
   return { form, cancel, feedback };
 }
 

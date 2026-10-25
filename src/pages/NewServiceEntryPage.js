@@ -52,6 +52,12 @@ export function createServiceEntryForm(readable, { entry = null } = {}) {
   form.id = entry ? 'edit-service-entry-form' : 'new-service-entry-form';
   form.className = 'service-form';
   form.noValidate = true;
+  form.setAttribute('aria-label', entry ? 'Редактирование записи обслуживания' : 'Новая запись обслуживания');
+  form.setAttribute('aria-describedby', 'service-form-required-note');
+  const requiredNote = document.createElement('p');
+  requiredNote.id = 'service-form-required-note';
+  requiredNote.className = 'form-required-note';
+  requiredNote.textContent = 'Поля со знаком * обязательны для заполнения.';
 
   const fields = document.createElement('div');
   fields.className = 'service-form__fields';
@@ -81,7 +87,7 @@ export function createServiceEntryForm(readable, { entry = null } = {}) {
   const feedback = document.createElement('div');
   feedback.className = 'service-form__feedback';
   feedback.setAttribute('aria-live', 'polite');
-  form.append(fields, actions, feedback);
+  form.append(fields, requiredNote, actions, feedback);
   return { form, feedback };
 }
 

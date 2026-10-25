@@ -454,3 +454,12 @@ npm run test:storage
 в нём могут остаться нужные записи: сначала скопируйте значения ключей
 `autojournal_v1_car`, `autojournal_v1_entries`, `autojournal_v1_plans`
 из DevTools в безопасное место.
+
+
+## FE-028 — сквозная приёмка основного сценария
+
+Проверены US-01–US-08 и AC-01–AC-03 на реальных экранах в Chromium. Итоги: `tests/fe028-acceptance-report.md`, ручной сценарий: `tests/fe028-manual-check.md`.
+
+Быстрые проверки: `npm test`. Браузерный сценарий без HTTP-сервера: `npm run test:e2e` после установки Python Playwright (`python -m pip install playwright` и `python -m playwright install chromium`).
+
+Браузерный тест запускается на чистой памяти и использует изолированную подмену localStorage для обхода запрета доступа к `file://` и localhost в тестовой среде. Повторное открытие моделируется новым документом с тем же JSON; настоящую перезагрузку страницы и нативный localStorage проверьте вручную через `npm run dev`. Код основных функций FE-027 не изменяется.

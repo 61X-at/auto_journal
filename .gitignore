@@ -8,3 +8,8 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+
+# FE-031: локальные результаты smoke-теста
+fe031-live-report.json
+fe031-live-screenshots/
+__pycache__/

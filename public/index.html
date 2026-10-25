@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>АвтоЖурнал — запуск приложения</title>
+</head>
+<body>
+  <p>Открываем «АвтоЖурнал»…</p>
+  <p><a href="./tempPage/index.html#/home">Перейти в приложение</a></p>
+  <script>
+    // Работает и на /, и на /auto_journal/ без изменения base URL.
+    // Сохраняем hash-маршрут и query-параметры при переходе с корня сайта.
+    const destination = new URL('./tempPage/index.html', window.location.href);
+    destination.search = window.location.search;
+    destination.hash = window.location.hash || '#/home';
+    window.location.replace(destination.href);
+  </script>
+</body>
+</html>

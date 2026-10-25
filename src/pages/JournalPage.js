@@ -5,6 +5,8 @@ import { createButton } from '../components/Button.js';
 import { createDemoForm } from '../components/DemoForm.js';
 import { createEmptyState } from '../components/EmptyState.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
+import { createSuccessNotice } from '../components/SuccessNotice.js';
+import { takeFlashNotice } from '../utils/flashNotice.js';
 import { deleteServiceEntry } from '../utils/serviceEntryActions.js';
 import { readEntries } from '../storage/localStorage.js';
 import { sortServiceEntriesByDate, formatServiceDate } from '../utils/serviceHistory.js';
@@ -173,6 +175,8 @@ export function renderJournalPage() {
   page.querySelector('#journal-filter-controls').append(form);
   const host = page.querySelector('#journal-records');
   const actionFeedback = page.querySelector('#journal-action-feedback');
+  const savedMessage = takeFlashNotice('journal');
+  if (savedMessage) actionFeedback.append(createSuccessNotice(savedMessage));
 
   const currentFilters = () => ({
     query: form.querySelector('#journal-query').value,
@@ -240,10 +244,7 @@ export function renderJournalPage() {
       return;
     }
     updateResults();
-    const status = document.createElement('p');
-    status.className = 'journal-action-success';
-    status.textContent = 'Запись удалена.';
-    actionFeedback.append(status);
+    actionFeedback.append(createSuccessNotice('Запись удалена.'));
   });
 
   updateResults();

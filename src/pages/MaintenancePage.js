@@ -2,6 +2,7 @@ import { pageFragment } from './pageFragment.js';
 import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
+import { createSuccessNotice } from '../components/SuccessNotice.js';
 import { createFormField, setFieldError } from '../components/FormField.js';
 import { createMaintenancePlan, validateMaintenancePlan } from '../models/maintenancePlan.js';
 import { validateCar } from '../models/car.js';
@@ -281,11 +282,9 @@ export function renderMaintenancePage() {
       return;
     }
     renderLists(latest.data);
-    const message = document.createElement('p');
-    message.className = 'maintenance-form__success';
-    message.setAttribute('role', 'status');
-    message.textContent = 'Работа отмечена как выполненная. Фактические работы и расходы можно добавить в журнал вручную.';
-    resultHost.append(message);
+    resultHost.append(createSuccessNotice(
+      'Работа отмечена как выполненная. Фактические работы и расходы можно добавить в журнал вручную.',
+    ));
     heading.focus();
   }
 
@@ -340,11 +339,7 @@ export function renderMaintenancePage() {
     showMaintenanceFormErrors(form);
     form.hidden = true;
     addButton.setAttribute('aria-expanded', 'false');
-    const message = document.createElement('p');
-    message.className = 'maintenance-form__success';
-    message.setAttribute('role', 'status');
-    message.textContent = 'Плановая работа сохранена.';
-    resultHost.append(message);
+    resultHost.append(createSuccessNotice('Плановая работа сохранена.'));
     heading.focus();
   });
 

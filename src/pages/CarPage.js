@@ -2,6 +2,7 @@ import { pageFragment } from './pageFragment.js';
 import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
+import { createSuccessNotice } from '../components/SuccessNotice.js';
 import { createFormField, setFieldError } from '../components/FormField.js';
 import { validateCar, MIN_CAR_YEAR } from '../models/car.js';
 import { readCar, saveCar } from '../storage/localStorage.js';
@@ -177,11 +178,7 @@ export function renderCarPage() {
       form.querySelector(`#${id}`).value = String(result.data[name]);
     }
     submit.textContent = 'Сохранить изменения';
-    const success = document.createElement('p');
-    success.className = 'car-form__success';
-    success.setAttribute('role', 'status');
-    success.textContent = 'Карточка автомобиля сохранена.';
-    feedback.append(success);
+    feedback.append(createSuccessNotice('Карточка автомобиля сохранена.'));
   });
   return page;
 }

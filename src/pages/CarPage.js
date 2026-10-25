@@ -84,6 +84,11 @@ function createCarForm(initial, readable) {
   form.id = 'car-profile-form';
   form.noValidate = true;
   form.setAttribute('aria-label', 'Сведения об автомобиле');
+  form.setAttribute('aria-describedby', 'car-form-required-note');
+  const requiredNote = document.createElement('p');
+  requiredNote.id = 'car-form-required-note';
+  requiredNote.className = 'form-required-note';
+  requiredNote.textContent = 'Поля со знаком * обязательны для заполнения.';
 
   const grid = document.createElement('div');
   grid.className = 'car-form__fields';
@@ -113,7 +118,7 @@ function createCarForm(initial, readable) {
   const feedback = document.createElement('div');
   feedback.className = 'car-form__feedback';
   feedback.setAttribute('aria-live', 'polite');
-  form.append(grid, actions, feedback);
+  form.append(grid, requiredNote, actions, feedback);
   return { form, submit, feedback };
 }
 

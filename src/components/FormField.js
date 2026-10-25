@@ -76,8 +76,10 @@ export function setFieldError(field, message) {
   error.hidden = !message;
   if (message) {
     input.setAttribute('aria-invalid', 'true');
+    input.setAttribute('aria-errormessage', error.id);
   } else {
     input.removeAttribute('aria-invalid');
+    input.removeAttribute('aria-errormessage');
   }
 
   const descriptionIds = (input.getAttribute('aria-describedby') || '')

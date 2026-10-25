@@ -22,7 +22,7 @@ const main = document.getElementById('main-content');
 const navigationLinks = [...document.querySelectorAll('.nav-list .nav-link')];
 
 function getCurrentRoute() {
-  const route = window.location.hash.replace(/^#\//, '');
+  const route = window.location.hash.replace(/^#\//, '').split('?')[0];
   if (/^journal\/edit\/[^/]+$/.test(route)) return 'journal/edit';
   return Object.hasOwn(routes, route) ? route : 'home';
 }

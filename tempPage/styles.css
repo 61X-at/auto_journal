@@ -355,3 +355,13 @@ button, input, select { font: inherit; }
   .entry-card__actions { width: 100%; margin-left: 0; }
   .entry-card__actions .button { flex: 1 1 0; }
 }
+
+/* FE-013: поиск и фильтрация записей в журнале. */
+.journal-filters { margin: 16px 0 18px; }
+.journal-filters > .button { flex: 0 0 auto; }
+#journal-records > .empty-state .button { display: inline-flex; margin-top: 16px; }
+@media (max-width: 740px) {
+  .journal-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .journal-filters .form-field { grid-column: 1 / -1; }
+  .journal-filters > .button { width: 100%; }
+}

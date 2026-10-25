@@ -1,3 +1,4 @@
+import { journalHash } from '../utils/serviceFilters.js';
 import { createButton } from '../components/Button.js';
 import { createSummaryCard } from '../components/SummaryCard.js';
 
@@ -16,5 +17,20 @@ export function renderHomePage() {
     createSummaryCard({ label: 'Записей в журнале', value: '2', hint: 'Примеры выполненных работ', icon: '≡' }),
     createSummaryCard({ label: 'Ближайшее ТО', value: '1', hint: 'Запланированная работа', icon: '▣' }),
   );
+  // FE-013: поисковые поля на главной ведут к реальным записям журнала.
+  // Сами демонстрационные карточки главной обновляются в FE-014.
+  const search = page.querySelector('#history .filters');
+  search.setAttribute('aria-label', 'Поиск по сохранённому журналу');
+  const query = search.querySelector('#entry-query');
+  const type = search.querySelector('#entry-category');
+  query.disabled = false;
+  type.disabled = false;
+  const submit = search.querySelector('button');
+  submit.disabled = false;
+  submit.type = 'submit';
+  search.addEventListener('submit', (event) => {
+    event.preventDefault();
+    window.location.hash = journalHash({ query: query.value, type: type.value });
+  });
   return page;
 }

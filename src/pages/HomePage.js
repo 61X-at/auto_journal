@@ -4,7 +4,7 @@ import { formatServiceDate } from '../utils/serviceHistory.js';
 import { readEntries } from '../storage/localStorage.js';
 import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
-import { createSummaryCard } from '../components/SummaryCard.js';
+import { mountExpenseOverview } from '../components/ExpenseOverview.js';
 
 /** FE-014: краткие карточки сохранённых событий, без действий редактирования. */
 export function createRecentServiceEntriesList(entries) {
@@ -57,9 +57,7 @@ export function createRecentServiceEntriesList(entries) {
   return list;
 }
 
-/** Главная страница: FE-014 подключает реальные последние записи.
- * Карточка автомобиля, расходы и план ТО остаются демонстрационными до своих задач.
- */
+/** FE-017: реальные расходы из записей; карточка автомобиля и план ТО пока демонстрационные. */
 export function renderHomePage() {
   const template = document.getElementById('home-page-template');
   if (!template) throw new Error('Не найден шаблон главной страницы');
@@ -68,12 +66,9 @@ export function renderHomePage() {
   const link = page.querySelector('.page-heading .button');
   link.replaceWith(createButton({ label: 'Добавить запись +', href: '#/journal/new' }));
 
-  const summary = page.querySelector('.summary-grid');
-  summary.replaceChildren(
-    createSummaryCard({ label: 'Всего расходов', value: '24 500 ₽', numericValue: 24500, hint: 'Демонстрационная сумма (FE-017)', icon: '₽' }),
-    createSummaryCard({ label: 'Записей в журнале', value: '2', hint: 'Демонстрационная сводка (FE-017)', icon: '≡' }),
-    createSummaryCard({ label: 'Ближайшее ТО', value: '1', hint: 'Демонстрационный план (FE-023)', icon: '▣' }),
-  );
+  // Читаем журнал единожды: и сводка расходов, и последние события согласованы.
+  const stored = readEntries();
+  mountExpenseOverview(page.querySelector('#expenses'), stored);
 
   // FE-013: поля на главной открывают результаты поиска в полном журнале.
   const search = page.querySelector('#history .filters');
@@ -92,7 +87,6 @@ export function renderHomePage() {
 
   // FE-014: никаких фиктивных записей. При каждом открытии читаем актуальный журнал.
   const preview = page.querySelector('#history .entry-list');
-  const stored = readEntries();
   if (!stored.ok) {
     preview.replaceWith(createEmptyState({
       title: 'История недоступна',

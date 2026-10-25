@@ -162,3 +162,7 @@
 
 Проверка: `node --test tests/fe021-maintenance-due.test.mjs`, `npm test`.
 Отображение состояния и отметка выполнения относятся к FE-022.
+
+### FE-022 — раздельные планы и отметка выполнения
+
+`pages/MaintenancePage.js` экспортирует `groupMaintenancePlans(plans, options)`, `createMaintenancePlanList(plans, options)` и `markMaintenancePlanDone(id, options)`. Первый метод группирует массив по сохранённому статусу и вычисляет для активных планов `due` из FE-021; второй отвечает за отображение и доступную кнопку; третий изменяет только указанный план в `autojournal_v1_plans` (FE-006), не затрагивая записи журнала. После отметки список перестраивается без перезагрузки, на странице есть ссылка для отдельной записи фактического ТО. Проверки — `tests/fe022-maintenance-status.test.mjs`.

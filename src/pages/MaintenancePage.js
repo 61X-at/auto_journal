@@ -3,8 +3,10 @@ import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
 import { createFormField, setFieldError } from '../components/FormField.js';
-import { createMaintenancePlan } from '../models/maintenancePlan.js';
-import { readPlans, savePlans } from '../storage/localStorage.js';
+import { createMaintenancePlan, validateMaintenancePlan } from '../models/maintenancePlan.js';
+import { validateCar } from '../models/car.js';
+import { getMaintenanceDueStatus } from '../utils/maintenanceDue.js';
+import { readCar, readPlans, savePlans } from '../storage/localStorage.js';
 
 const FIELD_IDS = Object.freeze({
   title: 'maintenance-title',
@@ -90,8 +92,62 @@ function formatDate(date) {
   return `${day}.${month}.${year}`;
 }
 
-/** FE-020: только базовый список сохранённых работ; статусы сроков и действия — FE-021/022. */
-export function createMaintenancePlanList(plans) {
+/**
+ * FE-022: делит планы на активные и выполненные, сохраняя их исходный порядок.
+ * Требующие внимания определяются по расчёту FE-021, а не отдельным полем в storage.
+ */
+export function groupMaintenancePlans(plans, options = {}) {
+  if (!Array.isArray(plans)) throw new TypeError('Ожидается массив плановых работ.');
+  const active = [];
+  const completed = [];
+  const invalid = [];
+  for (const plan of plans) {
+    const validated = validateMaintenancePlan(plan);
+    if (!validated.ok) {
+      invalid.push(plan);
+      continue;
+    }
+    const due = getMaintenanceDueStatus(validated.data, options);
+    const row = { plan: validated.data, due };
+    if (due.state === 'done') completed.push(row);
+    else active.push(row);
+  }
+  return { active, completed, invalid };
+}
+
+/**
+ * Отмечает один план выполненным. Не добавляет ServiceEntry и не меняет другие хранилища.
+ * Защищает от потери истории при повреждении JSON, дубле ID и ошибке записи.
+ */
+export function markMaintenancePlanDone(id, options = {}) {
+  if (typeof id !== 'string' || !id.trim()) {
+    return { ok: false, status: 'invalid_id', message: 'Не удалось определить плановую работу.' };
+  }
+  const existing = readPlans(options);
+  if (!existing.ok) return { ok: false, status: existing.status, message: existing.message };
+
+  const matches = existing.data.filter(plan => plan && plan.id === id);
+  if (matches.length !== 1) {
+    return {
+      ok: false, status: matches.length ? 'duplicate_id' : 'not_found',
+      message: matches.length ? 'Найдено несколько работ с одинаковым ID. Изменения не сохранены.' : 'Плановая работа не найдена.',
+    };
+  }
+  const validation = validateMaintenancePlan(matches[0]);
+  if (!validation.ok) {
+    return { ok: false, status: 'invalid_plan', message: 'Запись содержит некорректные данные. Статус не изменён.' };
+  }
+  if (validation.data.status === 'done') {
+    return { ok: true, status: 'already_done', data: validation.data };
+  }
+  const updated = existing.data.map(plan => plan.id === id ? { ...plan, status: 'done' } : plan);
+  const saved = savePlans(updated, options);
+  if (!saved.ok) return { ok: false, status: saved.status, message: saved.message };
+  return { ok: true, status: 'saved', data: updated.find(plan => plan.id === id) };
+}
+
+/** Одна переиспользуемая разметка для активной и выполненной истории. */
+export function createMaintenancePlanList(plans, { currentMileage = null, today = new Date(), onMarkDone } = {}) {
   if (!plans.length) {
     return createEmptyState({
       title: 'План ТО пока пуст',
@@ -101,34 +157,57 @@ export function createMaintenancePlanList(plans) {
   const list = document.createElement('ul');
   list.className = 'maintenance-plan-list';
   for (const plan of plans) {
+    const validated = validateMaintenancePlan(plan);
+    // Повреждённая отдельная запись не должна аварийно закрывать весь экран.
+    if (!validated.ok) continue;
+    const state = getMaintenanceDueStatus(validated.data, { currentMileage, today });
     const item = document.createElement('li');
     const article = document.createElement('article');
     article.className = 'plan-item';
     const info = document.createElement('div');
     const heading = document.createElement('h3');
-    heading.textContent = String(plan?.title ?? 'Без названия');
+    heading.textContent = validated.data.title;
     const details = document.createElement('p');
     const points = [];
-    if (plan?.dueDate) points.push(`Дата: ${formatDate(plan.dueDate)}`);
-    if (plan?.dueMileage !== null && plan?.dueMileage !== undefined) {
-      const km = Number(plan.dueMileage);
-      points.push(`Пробег: ${Number.isFinite(km) ? km.toLocaleString('ru-RU') : String(plan.dueMileage)} км`);
+    if (validated.data.dueDate) points.push(`Дата: ${formatDate(validated.data.dueDate)}`);
+    if (validated.data.dueMileage !== null) {
+      points.push(`Пробег: ${validated.data.dueMileage.toLocaleString('ru-RU')} км`);
     }
-    details.textContent = points.join(' · ') || 'Контрольная точка не указана';
+    details.textContent = points.join(' · ');
     info.append(heading, details);
+
     const badge = document.createElement('span');
-    badge.className = 'status';
-    badge.textContent = plan?.status === 'done' ? 'Выполнено' : 'Запланировано';
+    badge.className = `status status--${state.state === 'due' ? 'attention' : state.state}`;
+    badge.textContent = state.state === 'done' ? 'Выполнено' : state.state === 'due' ? 'Требует внимания' : 'Запланировано';
+    if (state.needsAttention) {
+      const icon = document.createElement('span');
+      icon.textContent = '⚠';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.className = 'status__icon';
+      badge.prepend(icon);
+    }
     article.append(info, badge);
+    if (state.state !== 'done' && typeof onMarkDone === 'function' && validated.data.id) {
+      const actions = document.createElement('div');
+      actions.className = 'maintenance-plan__actions';
+      const done = createButton({ label: 'Выполнено', variant: 'secondary' });
+      done.setAttribute('aria-label', `Отметить выполненной: ${validated.data.title}`);
+      done.addEventListener('click', () => onMarkDone(validated.data.id));
+      actions.append(done);
+      article.append(actions);
+    }
     item.append(article);
     list.append(item);
   }
   return list;
 }
 
-/** Список + форма на том же экране. После успешного создания возвращаем фокус к списку. */
+/** FE-022: активные и выполненные планы отображаются отдельно. */
 export function renderMaintenancePage() {
   const initial = readPlans();
+  const car = readCar();
+  const validatedCar = car.ok && car.data ? validateCar(car.data) : null;
+  const currentMileage = validatedCar?.ok ? validatedCar.data.currentMileage : null;
   const page = pageFragment(`
     <header class="page-heading">
       <div class="page-heading__text">
@@ -139,13 +218,21 @@ export function renderMaintenancePage() {
       <div id="maintenance-add-action"></div>
     </header>
     <section class="section section--single" aria-labelledby="plan-heading">
-      <h2 id="plan-heading" class="section-heading" tabindex="-1">Запланированные работы</h2>
+      <h2 id="plan-heading" class="section-heading" tabindex="-1">Активные работы</h2>
       <div id="maintenance-result" aria-live="polite"></div>
       <div id="maintenance-list"></div>
       <div id="maintenance-form-container"></div>
+      <section class="maintenance-completed" aria-labelledby="completed-heading">
+        <h2 id="completed-heading" class="section-heading">Выполненные работы</h2>
+        <div id="maintenance-completed-list"></div>
+        <p class="maintenance-plan__hint">Отметка «Выполнено» не создаёт запись в журнале.
+          Для учёта фактических работ и стоимости добавьте запись вручную
+          в <a href="#/journal/new">журнал обслуживания</a>.</p>
+      </section>
     </section>
   `);
   const listHost = page.querySelector('#maintenance-list');
+  const completedHost = page.querySelector('#maintenance-completed-list');
   const resultHost = page.querySelector('#maintenance-result');
   const heading = page.querySelector('#plan-heading');
   const addButton = createButton({ label: 'Добавить работу', disabled: !initial.ok });
@@ -156,17 +243,60 @@ export function renderMaintenancePage() {
   const { form, cancel, feedback } = createMaintenanceForm(initial.ok);
   page.querySelector('#maintenance-form-container').append(form);
 
-  function renderList(plans) {
-    listHost.replaceChildren(createMaintenancePlanList(plans));
+  function renderLists(plans) {
+    const groups = groupMaintenancePlans(plans, { currentMileage });
+    listHost.replaceChildren(groups.active.length
+      ? createMaintenancePlanList(groups.active.map(row => row.plan), { currentMileage, onMarkDone: completeWork })
+      : createEmptyState({
+        title: 'Активных работ нет',
+        description: 'Добавьте план ТО или посмотрите историю выполненных работ ниже.',
+      }));
+    completedHost.replaceChildren(groups.completed.length
+      ? createMaintenancePlanList(groups.completed.map(row => row.plan), { currentMileage })
+      : createEmptyState({
+        title: 'Выполненных работ пока нет',
+        description: 'Когда вы отметите план как выполненный, он появится здесь.',
+      }));
+    if (groups.invalid.length) {
+      resultHost.append(createErrorNotice('Некоторые записи плана ТО имеют некорректные данные и не отображаются. Они не были удалены.'));
+    }
+    if (currentMileage === null && groups.active.some(({ plan }) => plan.dueMileage !== null)) {
+      const notice = document.createElement('p');
+      notice.className = 'maintenance-plan__hint';
+      notice.textContent = 'Текущий пробег не указан. Сроки по пробегу будут проверяться после заполнения карточки автомобиля.';
+      listHost.append(notice);
+    }
+  }
+
+  function completeWork(id) {
+    resultHost.replaceChildren();
+    const response = markMaintenancePlanDone(id);
+    if (!response.ok) {
+      resultHost.append(createErrorNotice(response.message));
+      return;
+    }
+    const latest = readPlans();
+    if (!latest.ok) {
+      resultHost.append(createErrorNotice(latest.message));
+      return;
+    }
+    renderLists(latest.data);
+    const message = document.createElement('p');
+    message.className = 'maintenance-form__success';
+    message.setAttribute('role', 'status');
+    message.textContent = 'Работа отмечена как выполненная. Фактические работы и расходы можно добавить в журнал вручную.';
+    resultHost.append(message);
+    heading.focus();
   }
 
   if (initial.ok) {
-    renderList(initial.data);
+    renderLists(initial.data);
   } else {
     listHost.replaceChildren(createEmptyState({
       title: 'Не удалось загрузить план ТО',
       description: 'Сохранённые данные не были удалены или перезаписаны.',
     }));
+    completedHost.replaceChildren();
     resultHost.append(createErrorNotice(initial.message));
   }
 
@@ -200,13 +330,12 @@ export function renderMaintenancePage() {
       }
       return;
     }
-    // Перечитываем данные: на странице отображается именно сохранённый массив.
     const latest = readPlans();
     if (!latest.ok) {
       feedback.append(createErrorNotice(latest.message));
       return;
     }
-    renderList(latest.data);
+    renderLists(latest.data);
     form.reset();
     showMaintenanceFormErrors(form);
     form.hidden = true;

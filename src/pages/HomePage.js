@@ -1,10 +1,11 @@
 import { journalHash } from '../utils/serviceFilters.js';
 import { selectRecentServiceEntries } from '../utils/recentServiceEntries.js';
 import { formatServiceDate } from '../utils/serviceHistory.js';
-import { readEntries } from '../storage/localStorage.js';
+import { readEntries, readPlans, readCar } from '../storage/localStorage.js';
 import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
 import { mountExpenseOverview } from '../components/ExpenseOverview.js';
+import { mountUpcomingMaintenance } from '../components/UpcomingMaintenance.js';
 
 /** FE-014: краткие карточки сохранённых событий, без действий редактирования. */
 export function createRecentServiceEntriesList(entries) {
@@ -57,7 +58,7 @@ export function createRecentServiceEntriesList(entries) {
   return list;
 }
 
-/** FE-017: реальные расходы из записей; карточка автомобиля и план ТО пока демонстрационные. */
+/** FE-023: главная использует актуальные записи расходов и ближайший план ТО. */
 export function renderHomePage() {
   const template = document.getElementById('home-page-template');
   if (!template) throw new Error('Не найден шаблон главной страницы');
@@ -68,7 +69,12 @@ export function renderHomePage() {
 
   // Читаем журнал единожды: и сводка расходов, и последние события согласованы.
   const stored = readEntries();
-  mountExpenseOverview(page.querySelector('#expenses'), stored);
+  const upcoming = mountUpcomingMaintenance(page.querySelector('#maintenance'), {
+    plansResult: readPlans(), carResult: readCar(),
+  });
+  mountExpenseOverview(page.querySelector('#expenses'), stored, {
+    activeMaintenanceCount: upcoming.ok ? upcoming.activeCount : null,
+  });
 
   // FE-013: поля на главной открывают результаты поиска в полном журнале.
   const search = page.querySelector('#history .filters');

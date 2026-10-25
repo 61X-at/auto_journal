@@ -26,7 +26,7 @@
         <li><a class="nav-link" href="#/car"><span aria-hidden="true">◇</span> Автомобиль</a></li>
       </ul>
     </nav>
-    <p class="storage-note"><strong>Локальное хранение</strong><span>Последние записи берутся из локального журнала. Расходы и последние записи берутся из локального журнала. Карточка автомобиля и план ТО пока демонстрационные.</span></p>
+    <p class="storage-note"><strong>Локальное хранение</strong><span>Последние записи и расходы берутся из журнала, ближайшее ТО — из плана обслуживания. Карточка автомобиля на главной пока демонстрационная.</span></p>
   </header>
 
   <!-- Оболочка приложения: содержимое раздела заменяется без перезагрузки. -->
@@ -77,12 +77,11 @@
     <section id="maintenance" aria-labelledby="maintenance-heading" class="section section--maintenance">
       <header class="section-topline">
         <h2 id="maintenance-heading" class="section-kicker">Ближайшее обслуживание</h2>
-        <span class="status status--soon">Скоро ТО</span>
+        <span class="status status--planned">Нет активных работ</span>
       </header>
       <article class="maintenance-card" aria-label="Предстоящая работа">
-        <h3>Замена моторного масла</h3>
-        <p class="maintenance-card__subtitle">Плановый пробег: 90 000 км</p>
-        <p>Осталось по пробегу: <strong>3 800 км</strong></p>
+        <h3>План ТО пока пуст</h3>
+        <p>Добавьте первую плановую работу в разделе «План ТО».</p>
         <a class="text-link" href="#/maintenance">Перейти к плану ТО <span aria-hidden="true">→</span></a>
       </article>
     </section>
@@ -123,12 +122,12 @@
 
     <aside class="section section--notice" aria-labelledby="note-heading">
       <h2 id="note-heading">О демонстрационной странице</h2>
-      <p>Последние записи и расходы рассчитываются из локального журнала (FE-014, FE-017). Карточка машины и ближайшее ТО пока демонстрационные: их подключим в следующих задачах.</p>
+      <p>Последние записи и расходы берутся из журнала (FE-014, FE-017). Ближайшее ТО берётся из сохранённого плана (FE-023). Карточка автомобиля на главной пока демонстрационная — реальные данные доступны в разделе «Мой авто».</p>
     </aside>
   </template>
 
   <footer class="site-footer">
-    <p>АвтоЖурнал · Учебный проект · FE-017</p>
+    <p>АвтоЖурнал · Учебный проект · FE-023</p>
   </footer>
   <script type="module" src="../src/main.js"></script>
 </body>

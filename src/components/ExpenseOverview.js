@@ -68,7 +68,7 @@ function createCategoryBreakdown(details, byCategory, emptyHint) {
  * Подключается только на главной: фильтрация не меняет записи и не затрагивает журнал.
  * { ok:false } означает недоступное/повреждённое хранилище, а не нулевые расходы.
  */
-export function mountExpenseOverview(section, stored) {
+export function mountExpenseOverview(section, stored, { activeMaintenanceCount = 0 } = {}) {
   const cards = section.querySelector('.summary-grid');
   const details = section.querySelector('.expense-breakdown');
   if (!cards || !details) throw new Error('Отсутствует разметка сводки расходов');
@@ -122,7 +122,8 @@ export function mountExpenseOverview(section, stored) {
         numericValue: result.recordCount, hint: 'Всего сохранённых записей', icon: '≡',
       }),
       createSummaryCard({
-        label: 'Ближайшее ТО', value: '1', hint: 'Демонстрационный план (FE-023)', icon: '▣',
+        label: 'Активных работ ТО', value: activeMaintenanceCount === null ? '—' : String(activeMaintenanceCount),
+        hint: activeMaintenanceCount === null ? 'План ТО недоступен' : 'В плане обслуживания', icon: '▣',
       }),
     );
     const noEvents = !result.hasEventsInPeriod;

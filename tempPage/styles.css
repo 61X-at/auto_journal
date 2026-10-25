@@ -516,3 +516,8 @@ button, input, select { font: inherit; }
   .maintenance-plan__actions { width: 100%; }
   .maintenance-plan__actions .button { width: 100%; }
 }
+
+/* FE-023: длинные названия ТО и предупреждения не ломают узкую карточку. */
+.section--maintenance .section-topline { flex-wrap: wrap; }
+.section--maintenance .status { white-space: normal; }
+.maintenance-card { min-width: 0; overflow-wrap: anywhere; }

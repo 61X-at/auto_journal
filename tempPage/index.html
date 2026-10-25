@@ -26,7 +26,7 @@
         <li><a class="nav-link" href="#/car"><span aria-hidden="true">◇</span> Автомобиль</a></li>
       </ul>
     </nav>
-    <p class="storage-note"><strong>Локальное хранение</strong><span>Последние записи берутся из локального журнала. Карточка автомобиля, расходы и план ТО пока демонстрационные.</span></p>
+    <p class="storage-note"><strong>Локальное хранение</strong><span>Последние записи берутся из локального журнала. Расходы и последние записи берутся из локального журнала. Карточка автомобиля и план ТО пока демонстрационные.</span></p>
   </header>
 
   <!-- Оболочка приложения: содержимое раздела заменяется без перезагрузки. -->
@@ -89,17 +89,9 @@
 
     <section id="expenses" aria-labelledby="expenses-heading" class="section section--expenses">
       <h2 id="expenses-heading" class="section-heading">Коротко о главном</h2>
-      <!-- FE-005: эти карточки создаются общим компонентом SummaryCard. -->
+      <!-- FE-017: реальные расходы, выбор периода и сводные карточки создаются из сохранённых записей. -->
       <div class="summary-grid"></div>
-      <details class="expense-breakdown">
-        <summary>Расходы по категориям</summary>
-        <ul>
-          <li><span>Техническое обслуживание</span><strong>12 000 ₽</strong></li>
-          <li><span>Ремонт</span><strong>8 500 ₽</strong></li>
-          <li><span>Замена деталей</span><strong>4 000 ₽</strong></li>
-        </ul>
-        <p>Суммы демонстрационные и могут не совпадать с показанными ниже записями.</p>
-      </details>
+      <details class="expense-breakdown"></details>
     </section>
 
     <section id="history" aria-labelledby="history-heading" class="section section--history">
@@ -131,12 +123,12 @@
 
     <aside class="section section--notice" aria-labelledby="note-heading">
       <h2 id="note-heading">О демонстрационной странице</h2>
-      <p>Последние записи отображаются из локального журнала (FE-014). Карточка машины, блок расходов и ближайшее ТО пока демонстрационные: их подключим в следующих задачах.</p>
+      <p>Последние записи и расходы рассчитываются из локального журнала (FE-014, FE-017). Карточка машины и ближайшее ТО пока демонстрационные: их подключим в следующих задачах.</p>
     </aside>
   </template>
 
   <footer class="site-footer">
-    <p>АвтоЖурнал · Учебный проект · FE-014</p>
+    <p>АвтоЖурнал · Учебный проект · FE-017</p>
   </footer>
   <script type="module" src="../src/main.js"></script>
 </body>

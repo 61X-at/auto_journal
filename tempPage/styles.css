@@ -453,3 +453,30 @@ button, input, select { font: inherit; }
     overflow-wrap: anywhere;
   }
 }
+
+
+/* FE-017: фильтр периода и реальная сводка расходов на главной. */
+.expense-period-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 12px;
+  align-items: end;
+  margin: 0 0 16px;
+}
+.expense-period-form .form-field { min-width: 0; }
+.expense-period-form__actions { display: flex; align-items: center; gap: 8px; }
+.expense-period-form__actions .button { min-height: 44px; }
+.expense-period-feedback { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+.expense-period-feedback:empty { display: none; }
+.expense-period-feedback--empty { color: var(--muted); }
+.expense-period-feedback--error { color: #ae2e2e; }
+.expense-breakdown__note { margin: 10px 0 0; }
+@media (max-width: 850px) {
+  .expense-period-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .expense-period-form__actions { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .expense-period-form { grid-template-columns: minmax(0, 1fr); }
+  .expense-period-form__actions { grid-column: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .expense-period-form__actions .button { min-width: 0; }
+}

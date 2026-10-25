@@ -28,21 +28,36 @@ export function createServiceHistoryList(entries) {
     const title = document.createElement('h3');
     title.textContent = String(entry?.description ?? 'Запись обслуживания');
 
+    // FE-015: отдельные части метаданных можно перестраивать на узком экране,
+    // не теряя ни одного значения и не создавая мобильную копию записи.
     const detail = document.createElement('p');
+    detail.className = 'entry-card__meta';
+    const metaPart = (modifier, label, value) => {
+      const part = document.createElement('span');
+      part.className = `entry-card__meta-part entry-card__meta-part--${modifier}`;
+      const labelNode = document.createElement('span');
+      labelNode.className = 'entry-card__meta-label';
+      labelNode.textContent = `${label}: `;
+      part.append(labelNode, value);
+      return part;
+    };
     const dateText = formatServiceDate(entry?.date);
-    if (dateText === 'Дата не указана') {
-      detail.append(document.createTextNode(dateText));
-    } else {
+    let dateValue = document.createTextNode(dateText);
+    if (dateText !== 'Дата не указана') {
       const when = document.createElement('time');
       when.dateTime = entry.date;
       when.textContent = dateText;
-      detail.append(when);
+      dateValue = when;
     }
     const mileage = Number(entry?.mileage);
     const mileageText = Number.isFinite(mileage) && mileage >= 0
       ? `${mileage.toLocaleString('ru-RU')} км`
       : 'Пробег не указан';
-    detail.append(document.createTextNode(` · ${entry?.type ?? 'Тип не указан'} · ${mileageText}`));
+    detail.append(
+      metaPart('date', 'Дата', dateValue),
+      metaPart('type', 'Тип', document.createTextNode(String(entry?.type ?? 'Тип не указан'))),
+      metaPart('mileage', 'Пробег', document.createTextNode(mileageText)),
+    );
     text.append(title, detail);
 
     const amount = document.createElement('p');

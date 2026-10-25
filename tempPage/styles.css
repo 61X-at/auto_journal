@@ -480,3 +480,23 @@ button, input, select { font: inherit; }
   .expense-period-form__actions { grid-column: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .expense-period-form__actions .button { min-width: 0; }
 }
+
+/* FE-020: форма добавления планового ТО и простой список сохранённых работ. */
+.maintenance-plan-list { list-style: none; display: grid; gap: 12px; padding: 0; margin: 0; }
+.maintenance-plan-list > li { min-width: 0; }
+.maintenance-plan-list .plan-item > div { min-width: 0; overflow-wrap: anywhere; }
+.maintenance-form { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+.maintenance-form[hidden] { display: none; }
+.maintenance-form__fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.maintenance-form__fields .form-field { min-width: 0; }
+.maintenance-form__fields .form-field:first-child { grid-column: 1 / -1; }
+.maintenance-form__actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.maintenance-form__feedback { margin-top: 12px; }
+.maintenance-form__success { margin: 0 0 14px; color: #176b43; font-weight: 650; }
+#maintenance-add-action .button { min-height: 44px; }
+@media (max-width: 620px) {
+  .maintenance-form__fields { grid-template-columns: minmax(0, 1fr); }
+  .maintenance-form__fields .form-field:first-child { grid-column: auto; }
+  .maintenance-form__actions .button { flex: 1 1 100%; }
+  #maintenance-add-action .button { width: 100%; }
+}

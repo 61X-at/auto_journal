@@ -1,3 +1,5 @@
+import { SERVICE_ENTRY_TYPES } from '../models/serviceEntry.js';
+import { filterServiceEntries, journalHash, parseJournalFilters } from '../utils/serviceFilters.js';
 import { pageFragment } from './pageFragment.js';
 import { createButton } from '../components/Button.js';
 import { createDemoForm } from '../components/DemoForm.js';
@@ -80,9 +82,56 @@ export function createEmptyJournalState() {
   return empty;
 }
 
-/** FE-011: история по дате и пустое состояние с прямым переходом к форме. */
+/** FE-013: поисковая форма с двумя независимыми условиями. */
+export function createJournalFilters({ query = '', type = '' } = {}) {
+  const form = document.createElement('form');
+  form.className = 'filters journal-filters';
+  form.id = 'journal-filters';
+  form.setAttribute('role', 'search');
+  form.setAttribute('aria-label', 'Поиск и фильтрация истории');
+  form.innerHTML = `
+    <div class="form-field">
+      <label for="journal-query">Поиск по описанию</label>
+      <input id="journal-query" name="q" type="search" placeholder="Например, замена масла">
+    </div>
+    <div class="form-field">
+      <label for="journal-type">Тип события</label>
+      <select id="journal-type" name="type"></select>
+    </div>
+    <button class="button button--secondary" type="submit">Найти</button>
+    <button class="button button--secondary" type="reset">Сбросить</button>
+  `;
+  const selector = form.querySelector('#journal-type');
+  const all = document.createElement('option');
+  all.value = '';
+  all.textContent = 'Все типы';
+  selector.append(all);
+  for (const category of SERVICE_ENTRY_TYPES) {
+    const option = document.createElement('option');
+    option.value = category;
+    option.textContent = category === 'ТО' ? category : category[0].toUpperCase() + category.slice(1);
+    selector.append(option);
+  }
+  form.querySelector('#journal-query').value = query;
+  selector.value = type;
+  return form;
+}
+
+/** Отдельное состояние для отсутствия совпадений, отличное от пустого журнала. */
+export function createNoSearchResultsState() {
+  const empty = createEmptyState({
+    title: 'Ничего не найдено',
+    description: 'Попробуйте другой запрос или сбросьте условия поиска.',
+  });
+  const reset = createButton({ label: 'Сбросить фильтры', variant: 'secondary' });
+  reset.setAttribute('data-action', 'reset-journal-filters');
+  empty.append(reset);
+  return empty;
+}
+
+/** FE-011/FE-012/FE-013: журнал, сортировка, действия и комбинированная фильтрация. */
 export function renderJournalPage() {
-  const stored = readEntries();
+  const initial = parseJournalFilters(window.location.hash);
   const page = pageFragment(`
     <header class="page-heading">
       <div class="page-heading__text">
@@ -94,9 +143,10 @@ export function renderJournalPage() {
     </header>
     <section class="section section--single" aria-labelledby="journal-page-heading">
       <h2 id="journal-page-heading" class="section-heading">История обслуживания</h2>
-      <div id="journal-records"></div>
+      <div id="journal-filter-controls"></div>
+      <div id="journal-records" aria-live="polite"></div>
       <div id="journal-action-feedback" aria-live="polite"></div>
-      <p class="placeholder-note">Записи отсортированы от новых к старым. Поиск и фильтрация появятся в следующей задаче.</p>
+      <p class="placeholder-note">События отсортированы от новых к старым. Поиск и тип события можно использовать вместе.</p>
       <details class="component-example">
         <summary>Проверить общие компоненты формы (FE-005)</summary>
         <p class="component-example__note">Демонстрационная проверка полей без создания записи.</p>
@@ -104,24 +154,69 @@ export function renderJournalPage() {
       </details>
     </section>
   `);
+  const form = createJournalFilters(initial);
+  page.querySelector('#journal-filter-controls').append(form);
   const host = page.querySelector('#journal-records');
-  if (stored.ok && stored.data.length > 0) {
-    host.append(createServiceHistoryList(stored.data));
-  } else if (stored.ok) {
-    host.append(createEmptyJournalState());
-  } else {
-    host.append(createEmptyState({
-      title: 'История недоступна',
-      description: 'Данные журнала не удалось прочитать; сохранённое содержимое не перезаписывается.',
-    }));
-  }
-  // Делегирование: после удаления список заменяется, но обработчик остаётся один.
   const actionFeedback = page.querySelector('#journal-action-feedback');
-  host.addEventListener('click', (event) => {
+
+  const currentFilters = () => ({
+    query: form.querySelector('#journal-query').value,
+    type: form.querySelector('#journal-type').value,
+  });
+
+  // Перечитываем состояние после изменения и удаления: не держим устаревший массив.
+  function updateResults() {
+    const stored = readEntries();
+    if (!stored.ok) {
+      host.replaceChildren(createEmptyState({
+        title: 'История недоступна',
+        description: 'Данные журнала не удалось прочитать; сохранённое содержимое не перезаписывается.',
+      }));
+      return;
+    }
+    if (!stored.data.length) {
+      host.replaceChildren(createEmptyJournalState());
+      return;
+    }
+    const results = filterServiceEntries(stored.data, currentFilters());
+    host.replaceChildren(results.length
+      ? createServiceHistoryList(results)
+      : createNoSearchResultsState());
+  }
+
+  function setRouteForFilters(filters) {
+    const target = journalHash(filters);
+    if (window.location.hash !== target) {
+      // Обработчик hashchange в FE-004 восстановит форму и результаты из адреса.
+      window.location.hash = target;
+    } else {
+      updateResults();
+    }
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    actionFeedback.replaceChildren();
+    setRouteForFilters(currentFilters());
+  });
+  form.addEventListener('reset', event => {
+    event.preventDefault();
+    form.querySelector('#journal-query').value = '';
+    form.querySelector('#journal-type').value = '';
+    actionFeedback.replaceChildren();
+    setRouteForFilters({});
+  });
+
+  // Делегирование сохраняет действие «Удалить» после обновления списка.
+  host.addEventListener('click', event => {
+    const reset = event.target.closest('button[data-action="reset-journal-filters"]');
+    if (reset && host.contains(reset)) {
+      form.querySelector('button[type="reset"]').click();
+      return;
+    }
     const button = event.target.closest('button[data-action="delete-entry"]');
     if (!button || !host.contains(button)) return;
     const id = button.getAttribute('data-entry-id');
-    // Отмена диалога не вызывает запись в localStorage.
     if (!window.confirm('Удалить эту запись из журнала? Действие нельзя отменить.')) return;
     const deleted = deleteServiceEntry(id, { confirmed: true });
     actionFeedback.replaceChildren();
@@ -129,23 +224,14 @@ export function renderJournalPage() {
       actionFeedback.append(createErrorNotice(deleted.message));
       return;
     }
-    const current = readEntries();
-    if (!current.ok) {
-      host.replaceChildren(createEmptyState({
-        title: 'История недоступна',
-        description: 'Не удалось прочитать данные после удаления.',
-      }));
-      actionFeedback.append(createErrorNotice(current.message));
-      return;
-    }
-    host.replaceChildren(current.data.length
-      ? createServiceHistoryList(current.data)
-      : createEmptyJournalState());
+    updateResults();
     const status = document.createElement('p');
     status.className = 'journal-action-success';
     status.textContent = 'Запись удалена.';
     actionFeedback.append(status);
   });
+
+  updateResults();
   page.querySelector('#journal-form-demo').append(createDemoForm({
     id: 'journal-component-demo',
     fields: [

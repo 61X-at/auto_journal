@@ -4,6 +4,7 @@ import { createFormField, setFieldError } from '../components/FormField.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
 import { SERVICE_ENTRY_TYPES, createServiceEntry } from '../models/serviceEntry.js';
 import { readEntries, saveEntries } from '../storage/localStorage.js';
+import { setFlashNotice } from '../utils/flashNotice.js';
 
 const FIELD_IDS = Object.freeze({
   type: 'new-entry-type',
@@ -134,7 +135,8 @@ export function renderNewServiceEntryPage() {
       }
       return;
     }
-    // Маршрут журнала заново читает localStorage и отображает созданную запись.
+    // На странице журнала показываем одно подтверждение, не сохраняем его в localStorage.
+    setFlashNotice('journal', 'Запись обслуживания сохранена.');
     window.location.hash = '#/journal';
   });
   return page;

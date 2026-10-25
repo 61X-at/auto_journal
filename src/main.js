@@ -6,7 +6,6 @@ import { renderEditServiceEntryPage } from './pages/EditServiceEntryPage.js';
 import { renderMaintenancePage } from './pages/MaintenancePage.js';
 import { readCar, readEntries, readPlans } from './storage/localStorage.js';
 import { createErrorNotice } from './components/ErrorNotice.js';
-import { createEmptyState } from './components/EmptyState.js';
 
 /** FE-004: навигация по разделам без перезагрузки страницы и данных. */
 const routes = {
@@ -58,22 +57,10 @@ function showStorageErrors(current, content) {
   if (heading) heading.after(alert);
   else content.prepend(alert);
 
-  const safeState = () => createEmptyState({
-    title: 'Данные недоступны',
-    description: 'Содержимое хранилища не удалось прочитать. Мы не отображаем повреждённые записи.',
-  });
+  // FE-024: экраны уже отображают свои отдельные безопасные состояния.
+  // Не заменяем готовую разметку поверх них: например, недоступность одного
+  // журнала не должна скрывать корректный счётчик активных планов ТО.
 
-  if (broken.includes('car')) {
-    content.querySelector('.car-card, .profile-card')?.replaceWith(safeState());
-  }
-  if (broken.includes('entries')) {
-    content.querySelector('.section--history .entry-list, .section--single .entry-list')?.replaceWith(safeState());
-    content.querySelector('.summary-grid')?.replaceChildren(safeState());
-    content.querySelector('.expense-breakdown')?.remove();
-  }
-  if (broken.includes('plans')) {
-    content.querySelector('.maintenance-card, .plan-item')?.replaceWith(safeState());
-  }
 }
 
 function renderRoute() {

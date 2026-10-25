@@ -521,3 +521,9 @@ button, input, select { font: inherit; }
 .section--maintenance .section-topline { flex-wrap: wrap; }
 .section--maintenance .status { white-space: normal; }
 .maintenance-card { min-width: 0; overflow-wrap: anywhere; }
+
+/* FE-024: одинаковое подтверждение успешного действия на всех экранах. */
+.success-notice { margin: 8px 0 14px; color: #176b43; font-size: 14px; font-weight: 650; }
+.section--car .car-card > .empty-state { flex: 1; margin: 0; }
+.section--car .car-card .empty-state .button { display: inline-flex; margin-top: 14px; }
+.car-card__edit { display: inline-flex; margin-top: 15px; font-size: 13px; }

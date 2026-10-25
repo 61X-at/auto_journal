@@ -3,6 +3,7 @@ import { createButton } from '../components/Button.js';
 import { createErrorNotice } from '../components/ErrorNotice.js';
 import { readEntries } from '../storage/localStorage.js';
 import { updateServiceEntry } from '../utils/serviceEntryActions.js';
+import { setFlashNotice } from '../utils/flashNotice.js';
 import {
   createServiceEntryForm, readServiceEntryFormValues, showServiceEntryErrors,
 } from './NewServiceEntryPage.js';
@@ -50,6 +51,7 @@ export function renderEditServiceEntryPage(id) {
       if (result.status === 'validation_error') form.querySelector('[aria-invalid="true"]')?.focus();
       return;
     }
+    setFlashNotice('journal', 'Изменения записи сохранены.');
     // Переход перечитывает localStorage и отображает изменённую запись.
     window.location.hash = '#/journal';
   });

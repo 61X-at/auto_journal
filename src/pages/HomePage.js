@@ -4,6 +4,7 @@ import { formatServiceDate } from '../utils/serviceHistory.js';
 import { readEntries, readPlans, readCar } from '../storage/localStorage.js';
 import { createButton } from '../components/Button.js';
 import { createEmptyState } from '../components/EmptyState.js';
+import { mountHomeCarCard } from '../components/HomeCarCard.js';
 import { mountExpenseOverview } from '../components/ExpenseOverview.js';
 import { mountUpcomingMaintenance } from '../components/UpcomingMaintenance.js';
 
@@ -69,8 +70,10 @@ export function renderHomePage() {
 
   // Читаем журнал единожды: и сводка расходов, и последние события согласованы.
   const stored = readEntries();
+  const car = readCar();
+  mountHomeCarCard(page.querySelector('#car'), car);
   const upcoming = mountUpcomingMaintenance(page.querySelector('#maintenance'), {
-    plansResult: readPlans(), carResult: readCar(),
+    plansResult: readPlans(), carResult: car,
   });
   mountExpenseOverview(page.querySelector('#expenses'), stored, {
     activeMaintenanceCount: upcoming.ok ? upcoming.activeCount : null,

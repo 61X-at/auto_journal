@@ -226,3 +226,8 @@
 
 
 FE-028: основной пользовательский сценарий, негативные проверки и карта US/AC покрыты тестами `tests/fe028-acceptance.test.mjs` и `tests/fe028-e2e-browser.py` (не требуют изменения функционального JS).
+
+
+## FE-029 — материалы проверки удобства
+
+Логика приложения не менялась. Протокол и единая фикстура для участников: `tests/fe029-user-study-protocol.md`, `tests/fe029-test-data.md`; обезличенный CSV: `tests/fe029-session-results.csv`. Анализ: `scripts/fe029-analyze-study.mjs` через `npm run study:report`. Ручные заметки: `tests/fe029-observations.md`. Пока реальные испытания не проведены, итог остаётся неподтверждённым.

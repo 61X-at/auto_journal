@@ -1,0 +1,7 @@
+participant_id,task_id,completed,time_seconds,problems,notes
+P01,add,yes,23,нет,
+P01,find,yes,6,нет,
+P02,add,yes,18,нет,
+P02,find,yes,3,нет,
+P03,add,yes,21,нет,
+P03,find,yes,3,нет,

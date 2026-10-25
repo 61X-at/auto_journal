@@ -365,3 +365,91 @@ button, input, select { font: inherit; }
   .journal-filters .form-field { grid-column: 1 / -1; }
   .journal-filters > .button { width: 100%; }
 }
+
+/* FE-015: одна и та же история в компактной мобильной карточке.
+   Правила ограничены журналом: карточки последних записей на главной не меняются. */
+#journal-records .entry-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 8px;
+  row-gap: 2px;
+}
+#journal-records .entry-card__meta-part { min-width: 0; overflow-wrap: anywhere; }
+#journal-records .entry-card__meta-part + .entry-card__meta-part::before {
+  content: "·";
+  margin-right: 8px;
+}
+#journal-records .entry-card__meta-label { display: none; }
+
+@media (max-width: 620px) {
+  #journal-records .entry-list {
+    display: grid;
+    gap: 12px;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  #journal-records .entry-list > li {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  #journal-records .entry-list > li + li { border-top: 1px solid var(--line); }
+  #journal-records .entry-card {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-areas: "icon text" "price price" "actions actions";
+    align-items: start;
+    gap: 12px 10px;
+    padding: 14px;
+  }
+  #journal-records .entry-icon { grid-area: icon; }
+  #journal-records .entry-card__text {
+    grid-area: text;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #journal-records .entry-card h3 { font-size: 14px; }
+  #journal-records .entry-card__meta {
+    display: grid;
+    gap: 3px;
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  #journal-records .entry-card__meta-part + .entry-card__meta-part::before { content: none; }
+  #journal-records .entry-card__meta-label {
+    display: inline;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  #journal-records .entry-card__price {
+    grid-area: price;
+    justify-self: end;
+    max-width: 100%;
+    margin: 0;
+    font-size: 15px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  #journal-records .entry-card__actions {
+    grid-area: actions;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
+    margin: 0;
+  }
+  #journal-records .entry-card__actions .button {
+    min-width: 0;
+    min-height: 44px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

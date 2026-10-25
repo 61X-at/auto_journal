@@ -1,0 +1,43 @@
+name: Verify Published AutoJournal (FE-031)
+
+on:
+  workflow_run:
+    workflows: ["Deploy AutoJournal to GitHub Pages"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Playwright Chromium
+        run: |
+          python -m pip install "playwright>=1.50,<2"
+          python -m playwright install --with-deps chromium
+      - name: Verify deployed HTTPS demo
+        run: |
+          python tests/fe031-live-smoke.py \
+            --url "https://61x-at.github.io/auto_journal/" \
+            --report fe031-live-report.json \
+            --screenshots fe031-live-screenshots
+      - name: Upload smoke-test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fe031-live-smoke-report
+          path: |
+            fe031-live-report.json
+            fe031-live-screenshots/
+          if-no-files-found: ignore

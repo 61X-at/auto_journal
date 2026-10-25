@@ -15,7 +15,8 @@
     "test:study": "node --test tests/fe029-user-study.test.mjs",
     "study:report": "node scripts/fe029-analyze-study.mjs",
     "check:build": "node scripts/fe030-check-build.mjs",
-    "test:release": "node --test tests/fe030-release.test.mjs"
+    "test:release": "node --test tests/fe030-release.test.mjs",
+    "test:live": "python tests/fe031-live-smoke.py --url https://61x-at.github.io/auto_journal/ --report fe031-live-report.json"
   },
   "devDependencies": {
     "vite": "^6.0.0"
